@@ -77,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     progressDialog.dismiss();
                     Toast.makeText(RegisterActivity.this, "Registration Succesful", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                    startActivity(new Intent(RegisterActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                     finish();
                 } else {
                     progressDialog.hide();
