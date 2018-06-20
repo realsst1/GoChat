@@ -8,7 +8,7 @@ import android.widget.Button;
 
 public class StartActivity extends AppCompatActivity {
 
-    private Button regButton;
+    private Button regButton, loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +22,18 @@ public class StartActivity extends AppCompatActivity {
                 startActivity(new Intent(StartActivity.this, RegisterActivity.class));
             }
         });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(StartActivity.this, LoginActivity.class));
+            }
+        });
     }
 
     private void setupUIViews() {
+
         regButton = (Button) findViewById(R.id.regButton);
+        loginButton = (Button) findViewById(R.id.loginButton);
     }
 }
