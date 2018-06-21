@@ -1,7 +1,9 @@
 package com.example.shreyesh.gochat;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -48,6 +50,15 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+
+
+        changeStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String status = userStatus.getText().toString();
+                startActivity(new Intent(SettingsActivity.this, StatusActivity.class).putExtra("status", status));
             }
         });
 
