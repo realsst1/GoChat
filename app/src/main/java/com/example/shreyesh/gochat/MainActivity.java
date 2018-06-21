@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, StartActivity.class));
             finish();
         }
+        if (item.getItemId() == R.id.mainAccountSettings) {
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        }
         return true;
     }
 }
