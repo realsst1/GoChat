@@ -2,6 +2,7 @@ package com.example.shreyesh.gochat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +28,14 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -62,7 +70,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                 displayName.setText(name);
                 userStatus.setText(status);
-                Picasso.get().load(displayImage).into(circleImageView);
+
+                if (!displayImage.equals("default")) {
+                    Picasso.get().load(displayImage).placeholder(R.drawable.avatarplaceholder).into(circleImageView);
+                }
             }
 
             @Override
@@ -121,24 +132,62 @@ public class SettingsActivity extends AppCompatActivity {
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 String userID = currentUser.getUid();
 
+                File thumnbailFile = new File(resultUri.getPath());
+                Bitmap thumbnail = null;
+
+                try {
+                    thumbnail = new Compressor(this)
+                            .setMaxWidth(200)
+                            .setMaxHeight(200)
+                            .setQuality(50)
+                            .compressToBitmap(thumnbailFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                final byte[] dataValue = byteArrayOutputStream.toByteArray();
+
+                final StorageReference thumbPath = storageReference.child("profile_pictures").child("thumbs").child(userID + ".jpg");
+
                 StorageReference filepath = storageReference.child("profile_pictures").child(userID + ".jpg");
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
 
-                            String downloadURI = task.getResult().getDownloadUrl().toString();
-                            databaseReference.child("image").setValue(downloadURI).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            final String downloadURI = task.getResult().getDownloadUrl().toString();
+                            UploadTask uploadTask = thumbPath.putBytes(dataValue);
+                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                     if (task.isSuccessful()) {
-                                        progressDialog.dismiss();
+
+                                        String thumbURI = task.getResult().getDownloadUrl().toString();
+                                        Map hashMap = new HashMap<>();
+                                        hashMap.put("image", downloadURI);
+                                        hashMap.put("thumbnail", thumbURI);
+
+                                        databaseReference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    progressDialog.dismiss();
+                                                } else {
+                                                    progressDialog.hide();
+                                                    Toast.makeText(SettingsActivity.this, "Error" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+
                                     } else {
                                         progressDialog.hide();
-                                        Toast.makeText(SettingsActivity.this, "Error" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(SettingsActivity.this, "Error" + task.getException().getMessage(), Toast.LENGTH_LONG);
                                     }
                                 }
                             });
+
 
                         } else {
                             progressDialog.hide();

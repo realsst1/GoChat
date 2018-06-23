@@ -13,6 +13,9 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UsersActivity extends AppCompatActivity {
 
@@ -43,6 +46,8 @@ public class UsersActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
                 viewHolder.setName(model.getName());
+                viewHolder.setStatus(model.getStatus());
+                viewHolder.setImage(model.getImage());
             }
         };
 
@@ -63,6 +68,15 @@ public class UsersActivity extends AppCompatActivity {
             TextView userName = (TextView) mView.findViewById(R.id.userSingleName);
             userName.setText(name);
         }
-    }
 
+        public void setStatus(String status) {
+            TextView userStatus = (TextView) mView.findViewById(R.id.userSingleStatus);
+            userStatus.setText(status);
+        }
+
+        public void setImage(String image) {
+            CircleImageView circleImageView = (CircleImageView) mView.findViewById(R.id.userSingleImage);
+            Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(circleImageView);
+        }
+    }
 }

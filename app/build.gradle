@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.android.support:animated-vector-drawable:27.1.1'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
     implementation 'com.firebaseui:firebase-ui-database:2.0.1'
-
+    compile 'id.zelory:compressor:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
 }

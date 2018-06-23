@@ -1,12 +1,27 @@
 package com.example.shreyesh.gochat;
 
 public class Users {
-    private String name, status, image;
+    private String name, status, image, thumb;
 
     public Users(String name, String status, String image) {
         this.name = name;
         this.status = status;
         this.image = image;
+    }
+
+    public Users(String name, String status, String image, String thumb) {
+        this.name = name;
+        this.status = status;
+        this.image = image;
+        this.thumb = thumb;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public Users() {
