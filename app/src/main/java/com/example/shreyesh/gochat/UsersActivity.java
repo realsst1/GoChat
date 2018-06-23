@@ -1,5 +1,6 @@
 package com.example.shreyesh.gochat;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +49,15 @@ public class UsersActivity extends AppCompatActivity {
                 viewHolder.setName(model.getName());
                 viewHolder.setStatus(model.getStatus());
                 viewHolder.setImage(model.getImage());
+
+                final String userID = getRef(position).getKey();
+
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(UsersActivity.this, ProfileActivity.class).putExtra("user_id", userID));
+                    }
+                });
             }
         };
 
