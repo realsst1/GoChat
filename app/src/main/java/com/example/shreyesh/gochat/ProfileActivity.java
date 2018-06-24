@@ -105,9 +105,14 @@ public class ProfileActivity extends AppCompatActivity {
                             if (type.equals("received")) {
                                 sendRequestButton.setText("Accept Friend Request");
                                 currentState = "requestReceived";
+                                declineRequestButton.setVisibility(View.VISIBLE);
+                                declineRequestButton.setEnabled(true);
                             } else if (type.equals("sent")) {
                                 sendRequestButton.setText("Cancel Friend Request");
                                 currentState = "requestSent";
+                                declineRequestButton.setVisibility(View.INVISIBLE);
+                                declineRequestButton.setEnabled(false);
+
                             }
                         } else {
                             friendsDatabase.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -116,6 +121,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     if (dataSnapshot.hasChild(userID)) {
                                         currentState = "friends";
                                         sendRequestButton.setText("Unfriend");
+                                        declineRequestButton.setVisibility(View.INVISIBLE);
+                                        declineRequestButton.setEnabled(false);
+
                                     }
                                 }
 
@@ -170,6 +178,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                                             currentState = "requestSent";
                                             sendRequestButton.setText("Cancel Friend Request");
+                                            declineRequestButton.setVisibility(View.INVISIBLE);
+                                            declineRequestButton.setEnabled(false);
 
                                             Toast.makeText(ProfileActivity.this, "Request Sent", Toast.LENGTH_LONG).show();
                                         }
@@ -200,6 +210,8 @@ public class ProfileActivity extends AppCompatActivity {
                                             sendRequestButton.setEnabled(true);
                                             currentState = "notFriends";
                                             sendRequestButton.setText("Send Friend Request");
+                                            declineRequestButton.setVisibility(View.INVISIBLE);
+                                            declineRequestButton.setEnabled(false);
 
                                             Toast.makeText(ProfileActivity.this, "Request Cancelled", Toast.LENGTH_LONG).show();
                                         }
@@ -240,6 +252,8 @@ public class ProfileActivity extends AppCompatActivity {
                                                                 if (task.isSuccessful()) {
                                                                     currentState = "friends";
                                                                     sendRequestButton.setText("Unfriend");
+                                                                    declineRequestButton.setVisibility(View.INVISIBLE);
+                                                                    declineRequestButton.setEnabled(false);
 
                                                                     Toast.makeText(ProfileActivity.this, "Request Accepted", Toast.LENGTH_LONG).show();
                                                                 }
