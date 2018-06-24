@@ -71,7 +71,32 @@ public class ProfileActivity extends AppCompatActivity {
                 profileStatus.setText(status);
                 Picasso.get().load(image).placeholder(R.drawable.sqavatar).into(profileImage);
 
-                progressDialog.dismiss();
+                friendRequestDatabase.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        if (dataSnapshot.hasChild(userID)) {
+                            String type = dataSnapshot.child(userID).child("requestType").getValue().toString();
+                            if (type.equals("received")) {
+                                sendRequestButton.setText("Accept Friend Request");
+                                currentState = "requestRecieved";
+                            } else if (type.equals("sent")) {
+                                sendRequestButton.setText("Cancel Friend Request");
+                                currentState = "requestSent";
+                            }
+                        }
+                        progressDialog.dismiss();
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
 
 
             }
@@ -86,7 +111,13 @@ public class ProfileActivity extends AppCompatActivity {
         sendRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (currentState.equals("notFriends")) {
+
+                sendRequestButton.setEnabled(false);
+
+
+                //Not Friends
+
+                if (currentState.equals("notFriends") && userID != currentUser.getUid()) {
                     friendRequestDatabase.child(currentUser.getUid()).child(userID).child("requestType").setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -95,6 +126,11 @@ public class ProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
+
+                                            sendRequestButton.setEnabled(true);
+                                            currentState = "requestSent";
+                                            sendRequestButton.setText("Cancel Friend Request");
+
                                             Toast.makeText(ProfileActivity.this, "Request Sent", Toast.LENGTH_LONG).show();
                                         }
                                     }
@@ -106,6 +142,37 @@ public class ProfileActivity extends AppCompatActivity {
                     });
 
                 }
+
+                //Cancel Request
+
+                if (currentState.equals("requestSent") && userID != currentUser.getUid()) {
+
+                    friendRequestDatabase.child(currentUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                friendRequestDatabase.child(userID).child(currentUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                        if (task.isSuccessful()) {
+                                            sendRequestButton.setEnabled(true);
+                                            currentState = "notFriends";
+                                            sendRequestButton.setText("Send Friend Request");
+
+                                            Toast.makeText(ProfileActivity.this, "Request Cancelled", Toast.LENGTH_LONG).show();
+                                        }
+
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(ProfileActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+                }
+
             }
         });
 
