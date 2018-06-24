@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -32,11 +34,12 @@ public class UsersActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
         toolbar = (Toolbar) findViewById(R.id.usersToolbar);
         usersRecyclerView = (RecyclerView) findViewById(R.id.usersRecyclerView);
-        usersRecyclerView.setHasFixedSize(true);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("All Users");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        databaseReference.keepSynced(true);
     }
 
 
@@ -55,7 +58,10 @@ public class UsersActivity extends AppCompatActivity {
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startActivity(new Intent(UsersActivity.this, ProfileActivity.class).putExtra("user_id", userID));
+
+                        Intent intent = new Intent(UsersActivity.this, ProfileActivity.class);
+                        intent.putExtra("user_id", userID);
+                        startActivity(intent);
                     }
                 });
             }
@@ -84,9 +90,22 @@ public class UsersActivity extends AppCompatActivity {
             userStatus.setText(status);
         }
 
-        public void setImage(String image) {
-            CircleImageView circleImageView = (CircleImageView) mView.findViewById(R.id.userSingleImage);
-            Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(circleImageView);
+        public void setImage(final String image) {
+            final CircleImageView circleImageView = (CircleImageView) mView.findViewById(R.id.userSingleImage);
+
+            Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.sqavatar)
+                    .into(circleImageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(circleImageView);
+                        }
+                    });
+
         }
     }
 }

@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -62,18 +64,37 @@ public class ProfileActivity extends AppCompatActivity {
         friendRequestDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         friendsDatabase = FirebaseDatabase.getInstance().getReference().child("FriendsData");
 
+
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
+
+
+        friendsDatabase.keepSynced(true);
+        friendRequestDatabase.keepSynced(true);
+        databaseReference.keepSynced(true);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                final String image = dataSnapshot.child("image").getValue().toString();
 
                 profileDisplayName.setText(name);
                 profileStatus.setText(status);
-                Picasso.get().load(image).placeholder(R.drawable.sqavatar).into(profileImage);
+
+                Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.sqavatar)
+                        .into(profileImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Picasso.get().load(image).placeholder(R.drawable.sqavatar).into(profileImage);
+                            }
+                        });
+
 
                 friendRequestDatabase.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
@@ -88,6 +109,21 @@ public class ProfileActivity extends AppCompatActivity {
                                 sendRequestButton.setText("Cancel Friend Request");
                                 currentState = "requestSent";
                             }
+                        } else {
+                            friendsDatabase.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.hasChild(userID)) {
+                                        currentState = "friends";
+                                        sendRequestButton.setText("Unfriend");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                         }
                         progressDialog.dismiss();
 
