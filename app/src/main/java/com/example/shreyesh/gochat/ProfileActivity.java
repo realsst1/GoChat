@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -59,6 +60,9 @@ public class ProfileActivity extends AppCompatActivity {
         progressDialog.show();
 
         currentState = "notFriends";
+        declineRequestButton.setEnabled(false);
+        declineRequestButton.setVisibility(View.INVISIBLE);
+
 
         //Databases
         final String userID = getIntent().getStringExtra("from_user_id");
@@ -170,6 +174,7 @@ public class ProfileActivity extends AppCompatActivity {
                 //Not Friends
 
                 if (currentState.equals("notFriends") && !userID.equals(currentUser.getUid())) {
+
                     friendRequestDatabase.child(currentUser.getUid()).child(userID).child("requestType").setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -287,6 +292,37 @@ public class ProfileActivity extends AppCompatActivity {
 
                                     }
                                 });
+                            }
+                        }
+                    });
+
+                }
+
+
+                //Unfriend
+                if (currentState.equals("friends")) {
+
+                    friendsDatabase.child(currentUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                friendsDatabase.child(userID).child(currentUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+
+                                            currentState = "notFriends";
+                                            sendRequestButton.setText("Send Friend Request");
+                                            declineRequestButton.setVisibility(View.INVISIBLE);
+                                            declineRequestButton.setEnabled(false);
+                                        } else {
+                                            Toast.makeText(ProfileActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                        sendRequestButton.setEnabled(true);
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(ProfileActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }
                         }
                     });
