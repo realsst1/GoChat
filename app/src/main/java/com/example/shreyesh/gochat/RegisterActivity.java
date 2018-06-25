@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 
@@ -84,12 +85,14 @@ public class RegisterActivity extends AppCompatActivity {
 
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     String userID = currentUser.getUid();
+                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
                     databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
                     HashMap<String, String> userMap = new HashMap<>();
                     userMap.put("name", name);
                     userMap.put("status", "Hi there, I'm using GoChat! ");
                     userMap.put("image", "default");
                     userMap.put("thumbnail", "default");
+                    userMap.put("deviceToken", deviceToken);
 
                     databaseReference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

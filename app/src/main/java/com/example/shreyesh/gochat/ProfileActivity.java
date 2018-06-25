@@ -25,13 +25,14 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView profileDisplayName, profileStatus, profileFriendCount;
     private ImageView profileImage;
     private Button sendRequestButton, declineRequestButton;
-    private DatabaseReference databaseReference, friendRequestDatabase, friendsDatabase;
+    private DatabaseReference databaseReference, friendRequestDatabase, friendsDatabase, notificationDatabase;
     private ProgressDialog progressDialog;
     private String currentState;
     private FirebaseUser currentUser;
@@ -59,10 +60,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         currentState = "notFriends";
 
-        final String userID = getIntent().getStringExtra("user_id");
+        //Databases
+        final String userID = getIntent().getStringExtra("from_user_id");
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         friendRequestDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         friendsDatabase = FirebaseDatabase.getInstance().getReference().child("FriendsData");
+        notificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
 
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
@@ -71,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
         friendsDatabase.keepSynced(true);
         friendRequestDatabase.keepSynced(true);
         databaseReference.keepSynced(true);
+        notificationDatabase.keepSynced(true);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -175,13 +179,23 @@ public class ProfileActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
 
+                                            HashMap<String, String> notificationData = new HashMap<>();
+                                            notificationData.put("from", currentUser.getUid());
+                                            notificationData.put("type", "request");
 
-                                            currentState = "requestSent";
-                                            sendRequestButton.setText("Cancel Friend Request");
-                                            declineRequestButton.setVisibility(View.INVISIBLE);
-                                            declineRequestButton.setEnabled(false);
+                                            notificationDatabase.child(userID).push().setValue(notificationData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    currentState = "requestSent";
+                                                    sendRequestButton.setText("Cancel Friend Request");
+                                                    declineRequestButton.setVisibility(View.INVISIBLE);
+                                                    declineRequestButton.setEnabled(false);
 
-                                            Toast.makeText(ProfileActivity.this, "Request Sent", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(ProfileActivity.this, "Request Sent", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+
+
                                         }
                                     }
                                 });

@@ -60,7 +60,7 @@ public class UsersActivity extends AppCompatActivity {
                     public void onClick(View view) {
 
                         Intent intent = new Intent(UsersActivity.this, ProfileActivity.class);
-                        intent.putExtra("user_id", userID);
+                        intent.putExtra("from_user_id", userID);
                         startActivity(intent);
                     }
                 });
