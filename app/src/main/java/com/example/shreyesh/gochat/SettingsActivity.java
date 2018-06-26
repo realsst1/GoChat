@@ -2,8 +2,11 @@ package com.example.shreyesh.gochat;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -65,6 +68,16 @@ public class SettingsActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
 
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        } else
+            connected = false;
+
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,28 +113,31 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        if (connected == true) {
+            changeStatus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String status = userStatus.getText().toString();
+                    startActivity(new Intent(SettingsActivity.this, StatusActivity.class).putExtra("status", status));
+                }
+            });
 
-        changeStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String status = userStatus.getText().toString();
-                startActivity(new Intent(SettingsActivity.this, StatusActivity.class).putExtra("status", status));
-            }
-        });
 
+            changeImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    CropImage.activity()
+                            .setGuidelines(CropImageView.Guidelines.ON)
+                            .setAspectRatio(1, 1)
+                            .setMinCropResultSize(512, 512)
+                            .start(SettingsActivity.this);
 
-        changeImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setAspectRatio(1, 1)
-                        .setMinCropResultSize(512, 512)
-                        .start(SettingsActivity.this);
+                }
+            });
 
-            }
-        });
-
+        } else {
+            Toast.makeText(SettingsActivity.this, "No Internet.Check your Network Settings", Toast.LENGTH_LONG).show();
+        }
 
 
     }
@@ -129,7 +145,15 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (currentUser != null) {
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        } else
+            connected = false;
+        if (currentUser != null && connected == true) {
             userRef.child("online").setValue("true");
         }
     }
