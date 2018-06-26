@@ -251,11 +251,11 @@ public class ProfileActivity extends AppCompatActivity {
                 if (currentState.equals("requestReceived") && !userID.equals(currentUser.getUid())) {
 
                     final String currentDate = DateFormat.getDateInstance().format(new Date());
-                    friendsDatabase.child(currentUser.getUid()).child(userID).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    friendsDatabase.child(currentUser.getUid()).child(userID).child("date").setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                friendsDatabase.child(userID).child(currentUser.getUid()).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                friendsDatabase.child(userID).child(currentUser.getUid()).child("date").setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
