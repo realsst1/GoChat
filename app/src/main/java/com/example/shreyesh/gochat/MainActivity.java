@@ -58,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        userRef.child("online").setValue(false);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            userRef.child("online").setValue(false);
+        }
     }
 
     @Override

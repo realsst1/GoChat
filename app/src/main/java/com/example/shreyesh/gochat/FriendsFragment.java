@@ -1,6 +1,9 @@
 package com.example.shreyesh.gochat;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -74,7 +77,7 @@ public class FriendsFragment extends Fragment {
             @Override
             protected void populateViewHolder(final FriendsViewHolder viewHolder, Friends model, int position) {
                 viewHolder.setDate(model.getDate());
-                String userID = getRef(position).getKey();
+                final String userID = getRef(position).getKey();
                 userDatabaseReference.child(userID).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -86,6 +89,37 @@ public class FriendsFragment extends Fragment {
                         }
                         viewHolder.setName(userName);
                         viewHolder.setImage(thumb);
+
+                        viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send Message"};
+                                final AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                                alert.setTitle("Select Option");
+                                alert.setItems(options, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        switch (i) {
+                                            case 0:
+                                                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                                                intent.putExtra("from_user_id", userID);
+                                                startActivity(intent);
+                                                break;
+                                            case 1:
+                                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                                startActivity(chatIntent);
+                                                chatIntent.putExtra("from_user_id", userID);
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                });
+
+                                alert.show();
+                            }
+                        });
+
+
 
                     }
 

@@ -129,7 +129,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        userRef.child("online").setValue(true);
+        if (currentUser != null) {
+            userRef.child("online").setValue(true);
+        }
     }
 
     private void setupUIViews() {
