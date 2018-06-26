@@ -158,6 +158,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    protected void onResume() {
+        super.onResume();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
+    }
+
     private void setupUIViews() {
         circleImageView = (CircleImageView) findViewById(R.id.settingsImage);
         changeImage = (Button) findViewById(R.id.settingsChangeImageButton);

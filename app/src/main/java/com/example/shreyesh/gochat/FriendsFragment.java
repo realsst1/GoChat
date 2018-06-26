@@ -137,6 +137,7 @@ public class FriendsFragment extends Fragment {
         friendList.setAdapter(friendsRecylcerAdpater);
     }
 
+
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
         View view;
 

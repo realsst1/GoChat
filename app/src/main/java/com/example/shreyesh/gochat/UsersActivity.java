@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
@@ -24,7 +26,8 @@ public class UsersActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private RecyclerView usersRecyclerView;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, userRef;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,9 @@ public class UsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_users);
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
         toolbar = (Toolbar) findViewById(R.id.usersToolbar);
         usersRecyclerView = (RecyclerView) findViewById(R.id.usersRecyclerView);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,6 +74,18 @@ public class UsersActivity extends AppCompatActivity {
         };
 
         usersRecyclerView.setAdapter(firebaseRecyclerAdapter);
+
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
+
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
     }
 
     public static class UsersViewHolder extends RecyclerView.ViewHolder {

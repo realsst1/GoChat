@@ -60,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            userRef.child("online").setValue(ServerValue.TIMESTAMP);
+    protected void onResume() {
+        super.onResume();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
         }
     }
 

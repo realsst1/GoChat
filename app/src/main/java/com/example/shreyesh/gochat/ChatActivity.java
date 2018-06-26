@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,9 +30,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private String chatUser, chatUserName;
     private Toolbar chatToolbar;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, userRef;
     private TextView displayName, lastSeen;
     private CircleImageView profileImage;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class ChatActivity extends AppCompatActivity {
         chatUser = getIntent().getStringExtra("from_user_id");
         chatUserName = getIntent().getStringExtra("user_name");
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
 
 
         if (chatUser == null)
@@ -102,5 +107,23 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
+    }
+
+
 }
