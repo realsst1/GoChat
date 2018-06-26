@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/chatgrey"
     tools:context=".ChatActivity">
 
     <android.support.v7.widget.Toolbar
@@ -18,5 +19,38 @@
         app:layout_constraintTop_toTopOf="parent">
 
     </android.support.v7.widget.Toolbar>
+
+    <ImageView
+        android:id="@+id/addFilesImageButton"
+        android:layout_width="65dp"
+        android:layout_height="55dp"
+        android:background="@color/white"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView4"
+        app:srcCompat="@drawable/baseline_add_black_24dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
+        app:layout_constraintStart_toEndOf="@+id/addFilesImageButton"
+        app:layout_constraintTop_toTopOf="@+id/sendMessageButton" />
+
+    <ImageView
+        android:id="@+id/sendMessageButton"
+        android:layout_width="65dp"
+        android:layout_height="55dp"
+        android:background="@color/white"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/baseline_send_black_24dp" />
+
 
 </android.support.constraint.ConstraintLayout>

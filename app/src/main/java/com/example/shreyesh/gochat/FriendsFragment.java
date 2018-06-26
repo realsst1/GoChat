@@ -84,7 +84,7 @@ public class FriendsFragment extends Fragment {
                         final String userName = dataSnapshot.child("name").getValue().toString();
                         String thumb = dataSnapshot.child("thumbnail").getValue().toString();
                         if (dataSnapshot.hasChild("online")) {
-                            Boolean userOnline = (Boolean) dataSnapshot.child("online").getValue();
+                            String userOnline = dataSnapshot.child("online").getValue().toString();
                             viewHolder.setUserOnline(userOnline);
                         }
                         viewHolder.setName(userName);
@@ -171,9 +171,9 @@ public class FriendsFragment extends Fragment {
         }
 
 
-        public void setUserOnline(Boolean image) {
+        public void setUserOnline(String image) {
             ImageView imageView = (ImageView) view.findViewById(R.id.userSingleOnlineDot);
-            if (image == true) {
+            if (image.equals("true")) {
                 imageView.setVisibility(View.VISIBLE);
             } else {
                 imageView.setVisibility(View.INVISIBLE);

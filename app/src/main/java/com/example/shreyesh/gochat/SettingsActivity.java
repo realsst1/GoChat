@@ -130,7 +130,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (currentUser != null) {
-            userRef.child("online").setValue(true);
+            userRef.child("online").setValue("true");
         }
     }
 

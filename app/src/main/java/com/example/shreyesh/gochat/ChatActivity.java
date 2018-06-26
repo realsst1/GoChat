@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -13,12 +14,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
     private String chatUser, chatUserName;
     private Toolbar chatToolbar;
     private DatabaseReference databaseReference;
+    private TextView displayName, lastSeen;
+    private CircleImageView profileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +46,51 @@ public class ChatActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setTitle(chatUserName);
+
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.chat_app_bar_layout, null);
 
         actionBar.setCustomView(view);
+
+
+        displayName = (TextView) findViewById(R.id.chatBarDisplayName);
+        lastSeen = (TextView) findViewById(R.id.chatBarLastSeen);
+        profileImage = (CircleImageView) findViewById(R.id.chatAppbarImage);
+
+        displayName.setText(chatUserName);
+
+        databaseReference.child("users").child(chatUser).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String online = dataSnapshot.child("online").getValue().toString();
+                final String image = dataSnapshot.child("thumbnail").getValue().toString();
+
+                if (online.equals("true")) {
+                    lastSeen.setText("online");
+                } else {
+                    lastSeen.setText("last seen at " + online);
+                }
+
+                Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.avatarplaceholder).into(profileImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(profileImage);
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
 

@@ -343,7 +343,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     protected void onStart() {
         super.onStart();
-        userRef.child("online").setValue(true);
+        userRef.child("online").setValue("true");
     }
 
 }

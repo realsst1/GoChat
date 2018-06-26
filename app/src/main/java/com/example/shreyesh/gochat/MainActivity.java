@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, StartActivity.class));
             finish();
         } else {
-            userRef.child("online").setValue(true);
+            userRef.child("online").setValue("true");
         }
     }
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            userRef.child("online").setValue(false);
+            userRef.child("online").setValue(ServerValue.TIMESTAMP);
         }
     }
 
