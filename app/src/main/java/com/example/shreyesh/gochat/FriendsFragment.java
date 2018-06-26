@@ -81,7 +81,7 @@ public class FriendsFragment extends Fragment {
                 userDatabaseReference.child(userID).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        String userName = dataSnapshot.child("name").getValue().toString();
+                        final String userName = dataSnapshot.child("name").getValue().toString();
                         String thumb = dataSnapshot.child("thumbnail").getValue().toString();
                         if (dataSnapshot.hasChild("online")) {
                             Boolean userOnline = (Boolean) dataSnapshot.child("online").getValue();
@@ -106,9 +106,11 @@ public class FriendsFragment extends Fragment {
                                                 startActivity(intent);
                                                 break;
                                             case 1:
-                                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                                startActivity(chatIntent);
-                                                chatIntent.putExtra("from_user_id", userID);
+                                                Intent chatintent = new Intent(getContext(), ChatActivity.class);
+                                                chatintent.putExtra("from_user_id", userID);
+                                                chatintent.putExtra("user_name", userName);
+                                                startActivity(chatintent);
+
                                             default:
                                                 break;
                                         }
