@@ -38,8 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(sectionsPagerAdapter);
+        if (firebaseAuth.getCurrentUser() != null) {
 
-        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseAuth.getCurrentUser().getUid());
+            userRef = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseAuth.getCurrentUser().getUid());
+        } else {
+            startActivity(new Intent(MainActivity.this, StatusActivity.class));
+        }
 
         tabLayout.setupWithViewPager(viewPager);
 

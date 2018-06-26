@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -17,6 +18,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -60,6 +64,8 @@ public class ChatActivity extends AppCompatActivity {
 
         displayName.setText(chatUserName);
 
+        databaseReference.keepSynced(true);
+
         databaseReference.child("users").child(chatUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -69,7 +75,11 @@ public class ChatActivity extends AppCompatActivity {
                 if (online.equals("true")) {
                     lastSeen.setText("online");
                 } else {
-                    lastSeen.setText("last seen at " + online);
+                    long time = Long.parseLong(online);
+                    GetTimeAgo getTimeAgo = new GetTimeAgo();
+
+                    String date = getTimeAgo.getTimeAgo(time, getApplicationContext());
+                    lastSeen.setText("last seen at " + date);
                 }
 
                 Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.avatarplaceholder).into(profileImage, new Callback() {
