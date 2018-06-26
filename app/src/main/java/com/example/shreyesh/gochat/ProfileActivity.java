@@ -33,7 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView profileDisplayName, profileStatus, profileFriendCount;
     private ImageView profileImage;
     private Button sendRequestButton, declineRequestButton;
-    private DatabaseReference databaseReference, friendRequestDatabase, friendsDatabase, notificationDatabase;
+    private DatabaseReference databaseReference, friendRequestDatabase, friendsDatabase, notificationDatabase, userRef;
     private ProgressDialog progressDialog;
     private String currentState;
     private FirebaseUser currentUser;
@@ -70,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         friendRequestDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         friendsDatabase = FirebaseDatabase.getInstance().getReference().child("FriendsData");
         notificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
 
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
@@ -338,4 +339,11 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     }
+
+
+    protected void onStart() {
+        super.onStart();
+        userRef.child("online").setValue(true);
+    }
+
 }

@@ -39,4 +39,15 @@
         app:layout_constraintStart_toEndOf="@+id/userSingleImage"
         app:layout_constraintTop_toBottomOf="@+id/userSingleName" />
 
+    <ImageView
+        android:id="@+id/userSingleOnlineDot"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="32dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/onlinedot" />
+
 </android.support.constraint.ConstraintLayout>

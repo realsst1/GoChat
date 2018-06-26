@@ -43,7 +43,7 @@ import id.zelory.compressor.Compressor;
 public class SettingsActivity extends AppCompatActivity {
 
 
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, userRef;
     private CircleImageView circleImageView;
     private Button changeImage, changeStatus;
     private TextView displayName, userStatus;
@@ -60,6 +60,7 @@ public class SettingsActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userID = currentUser.getUid();
         databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
         databaseReference.keepSynced(true);
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
@@ -125,6 +126,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        userRef.child("online").setValue(true);
+    }
 
     private void setupUIViews() {
         circleImageView = (CircleImageView) findViewById(R.id.settingsImage);
