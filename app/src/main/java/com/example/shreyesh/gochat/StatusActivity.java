@@ -42,34 +42,36 @@ public class StatusActivity extends AppCompatActivity {
 
         statusInputField.getEditText().setText(status);
 
-        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressDialog = new ProgressDialog(StatusActivity.this);
-                progressDialog.setTitle("Saving Changes");
-                progressDialog.setMessage("Please wait while we save changes... ");
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                String status = statusInputField.getEditText().getText().toString();
-                databaseReference.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            progressDialog.dismiss();
-                        } else {
-                            progressDialog.hide();
-                            Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+            String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
+
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    progressDialog = new ProgressDialog(StatusActivity.this);
+                    progressDialog.setTitle("Saving Changes");
+                    progressDialog.setMessage("Please wait while we save changes... ");
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.show();
+                    String status = statusInputField.getEditText().getText().toString();
+                    databaseReference.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                progressDialog.dismiss();
+                            } else {
+                                progressDialog.hide();
+                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+
                         }
+                    });
 
-                    }
-                });
-
-            }
-        });
-
+                }
+            });
+        }
 
     }
 }

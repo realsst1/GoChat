@@ -40,19 +40,21 @@ public class UsersActivity extends AppCompatActivity {
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
         toolbar = (Toolbar) findViewById(R.id.usersToolbar);
         usersRecyclerView = (RecyclerView) findViewById(R.id.usersRecyclerView);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("All Users");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         databaseReference.keepSynced(true);
+
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(Users.class, R.layout.users_single_list, UsersViewHolder.class, databaseReference) {
+        FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(Users.class,
+                R.layout.users_single_list, UsersViewHolder.class, databaseReference) {
             @Override
             protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
                 viewHolder.setName(model.getName());
@@ -74,6 +76,7 @@ public class UsersActivity extends AppCompatActivity {
         };
 
         usersRecyclerView.setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
 
         if (currentUser != null) {
             userRef.child("online").setValue("true");
