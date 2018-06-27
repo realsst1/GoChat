@@ -3,6 +3,8 @@ package com.example.shreyesh.gochat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,9 +30,11 @@ import com.squareup.picasso.Picasso;
 
 import java.security.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -49,11 +54,22 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView sendFilesButton, sendMessageButton;
 
 
+    private RecyclerView messageList;
+
+
+    private List<Messages> messagesListView;
+    private LinearLayoutManager layoutManager;
+    private MessageAdapter messageAdapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+
+        messagesListView = new ArrayList<>();
+        messageAdapter = new MessageAdapter(messagesListView);
 
         //Initialize values
         chatUser = getIntent().getStringExtra("from_user_id");
@@ -91,11 +107,18 @@ public class ChatActivity extends AppCompatActivity {
         sendFilesButton = (ImageView) findViewById(R.id.addFilesImageButton);
         sendMessageButton = (ImageView) findViewById(R.id.sendMessageButton);
         sendMessageText = (EditText) findViewById(R.id.sendMessageText);
+        messageList = (RecyclerView) findViewById(R.id.messageList);
 
+        layoutManager = new LinearLayoutManager(this);
+        messageList.setLayoutManager(layoutManager);
+        messageList.setAdapter(messageAdapter);
 
         displayName.setText(chatUserName);
 
         databaseReference.keepSynced(true);
+
+
+        loadMessages();
 
         databaseReference.child("users").child(chatUser).addValueEventListener(new ValueEventListener() {
             @Override
@@ -181,6 +204,39 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void loadMessages() {
+
+        databaseReference.child("messages").child(currentUserID).child(chatUser).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Messages messages = dataSnapshot.getValue(Messages.class);
+                messagesListView.add(messages);
+                messageAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sendMessage() {
