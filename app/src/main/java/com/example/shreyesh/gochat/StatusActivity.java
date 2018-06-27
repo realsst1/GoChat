@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 public class StatusActivity extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class StatusActivity extends AppCompatActivity {
     private Toolbar statusPageToolbar;
     private TextInputLayout statusInputField;
     private Button saveButton;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, userRef;
     private ProgressDialog progressDialog;
 
     @Override
@@ -37,6 +38,7 @@ public class StatusActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         statusInputField = (TextInputLayout) findViewById(R.id.changeStatusInputField);
         saveButton = (Button) findViewById(R.id.statusSaveButton);
+        userRef = FirebaseDatabase.getInstance().getReference().child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         String status = getIntent().getStringExtra("status");
 
@@ -79,5 +81,22 @@ public class StatusActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+
+    protected void onResume() {
+        super.onResume();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            userRef.child("online").setValue("true");
+        }
+    }
+
+    protected void onPause() {
+        super.onPause();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            userRef.child("online").setValue(ServerValue.TIMESTAMP);
+        }
     }
 }

@@ -68,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void onPause() {
+        super.onPause();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            userRef.child("online").setValue(ServerValue.TIMESTAMP);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
