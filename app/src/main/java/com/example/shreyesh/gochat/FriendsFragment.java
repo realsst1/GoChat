@@ -174,6 +174,7 @@ public class FriendsFragment extends Fragment {
 
         public void setUserOnline(String image) {
             ImageView imageView = (ImageView) view.findViewById(R.id.userSingleOnlineDot);
+
             if (image.equals("true")) {
                 imageView.setVisibility(View.VISIBLE);
             } else {

@@ -47,30 +47,36 @@ public class StatusActivity extends AppCompatActivity {
             String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
             databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
 
-            saveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    progressDialog = new ProgressDialog(StatusActivity.this);
-                    progressDialog.setTitle("Saving Changes");
-                    progressDialog.setMessage("Please wait while we save changes... ");
-                    progressDialog.setCanceledOnTouchOutside(false);
-                    progressDialog.show();
-                    String status = statusInputField.getEditText().getText().toString();
-                    databaseReference.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                progressDialog.dismiss();
-                            } else {
-                                progressDialog.hide();
-                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+
+            if (AppStatus.getInstance(this).isOnline()) {
+
+                saveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        progressDialog = new ProgressDialog(StatusActivity.this);
+                        progressDialog.setTitle("Saving Changes");
+                        progressDialog.setMessage("Please wait while we save changes... ");
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.show();
+                        String status = statusInputField.getEditText().getText().toString();
+                        databaseReference.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                } else {
+                                    progressDialog.hide();
+                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
+
                             }
+                        });
 
-                        }
-                    });
-
-                }
-            });
+                    }
+                });
+            } else {
+                Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+            }
         }
 
     }

@@ -113,7 +113,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        if (connected == true) {
+        if (AppStatus.getInstance(this).isOnline()) {
             changeStatus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -121,8 +121,10 @@ public class SettingsActivity extends AppCompatActivity {
                     startActivity(new Intent(SettingsActivity.this, StatusActivity.class).putExtra("status", status));
                 }
             });
-
-
+        } else {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+        }
+        if (AppStatus.getInstance(this).isOnline()) {
             changeImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -134,13 +136,12 @@ public class SettingsActivity extends AppCompatActivity {
 
                 }
             });
-
         } else {
-            Toast.makeText(SettingsActivity.this, "No Internet.Check your Network Settings", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
         }
 
-
     }
+
 
     @Override
     protected void onStart() {
