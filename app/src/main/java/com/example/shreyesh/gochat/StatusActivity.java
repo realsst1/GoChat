@@ -83,7 +83,6 @@ public class StatusActivity extends AppCompatActivity {
 
     }
 
-
     protected void onResume() {
         super.onResume();
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
