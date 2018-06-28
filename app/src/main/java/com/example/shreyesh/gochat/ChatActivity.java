@@ -126,6 +126,7 @@ public class ChatActivity extends AppCompatActivity {
         displayName.setText(chatUserName);
 
         databaseReference.keepSynced(true);
+        userRef.keepSynced(true);
 
 
         loadMessages();
