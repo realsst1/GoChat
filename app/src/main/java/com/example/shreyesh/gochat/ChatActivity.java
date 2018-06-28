@@ -1,5 +1,7 @@
 package com.example.shreyesh.gochat;
 
+import android.provider.ContactsContract;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
@@ -55,11 +58,14 @@ public class ChatActivity extends AppCompatActivity {
 
 
     private RecyclerView messageList;
+    private static final int TOTAL_ITEMS_TO_LOAD = 10;
 
 
     private List<Messages> messagesListView;
     private LinearLayoutManager layoutManager;
     private MessageAdapter messageAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private int currentPage = 1;
 
 
     @Override
@@ -108,6 +114,7 @@ public class ChatActivity extends AppCompatActivity {
         sendMessageButton = (ImageView) findViewById(R.id.sendMessageButton);
         sendMessageText = (EditText) findViewById(R.id.sendMessageText);
         messageList = (RecyclerView) findViewById(R.id.messageList);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.messageSwipeLayout);
 
         layoutManager = new LinearLayoutManager(this);
         messageList.setLayoutManager(layoutManager);
@@ -204,16 +211,34 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                currentPage++;
+                messagesListView.clear();
+                loadMessages();
+            }
+        });
+
+
     }
 
     private void loadMessages() {
 
-        databaseReference.child("messages").child(currentUserID).child(chatUser).addChildEventListener(new ChildEventListener() {
+
+        DatabaseReference messageDatabaseReference = databaseReference.child("messages").child(currentUserID).child(chatUser);
+
+        Query messageQuery = messageDatabaseReference.limitToLast(currentPage * TOTAL_ITEMS_TO_LOAD);
+
+        messageDatabaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages = dataSnapshot.getValue(Messages.class);
                 messagesListView.add(messages);
                 messageAdapter.notifyDataSetChanged();
+                messageList.scrollToPosition(messagesListView.size() - 1);
+
+                swipeRefreshLayout.setRefreshing(false);
 
             }
 
@@ -255,6 +280,7 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", currentUserID);
 
             Map messageUserMap = new HashMap();
             messageUserMap.put(currentUserRef + "/" + pushID, messageMap);

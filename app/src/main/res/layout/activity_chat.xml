@@ -46,6 +46,7 @@
         android:layout_height="0dp"
         android:background="@color/white"
         android:ems="10"
+        android:padding="10dp"
         android:hint="Type a message"
         android:inputType="textPersonName"
         android:textColorHint="@color/chatgrey"
@@ -54,14 +55,25 @@
         app:layout_constraintStart_toEndOf="@+id/addFilesImageButton"
         app:layout_constraintTop_toTopOf="@+id/sendMessageButton" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/messageList"
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/messageSwipeLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/chatToolbar">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/messageList"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/sendMessageText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chatToolbar" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 </android.support.constraint.ConstraintLayout>
