@@ -1,14 +1,18 @@
 package com.example.shreyesh.gochat;
 
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -19,6 +23,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     private List<Messages> messagesList;
     private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
 
     public MessageAdapter(List<Messages> messagesList) {
         this.messagesList = messagesList;
@@ -40,14 +45,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         String message = messagesList.get(position).getMessage();
         String fromUserID = messagesList.get(position).getFrom();
         if (fromUserID.equals(currentUserID)) {
-            holder.messageText.setBackgroundColor(Color.WHITE);
+            holder.messageText.setBackgroundResource(R.drawable.message_single_current);
             holder.messageText.setTextColor(Color.BLACK);
         } else {
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
         }
 
+
         holder.setMessageText(message);
+
     }
 
     @Override
@@ -71,6 +78,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         public void setMessageText(String message) {
             messageText.setText(message);
+        }
+
+        public void setMessageImage(String image) {
+            Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(messageImage);
         }
     }
 

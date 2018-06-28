@@ -66,7 +66,10 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int currentPage = 1;
+    private int itemPos = 0;
 
+    private String lastKey = "";
+    private String prevKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,11 +218,67 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 currentPage++;
-                messagesListView.clear();
-                loadMessages();
+                itemPos = 0;
+                loadMoreMessages();
             }
         });
 
+
+    }
+
+    private void loadMoreMessages() {
+        DatabaseReference messageDatabaseReference = databaseReference.child("messages").child(currentUserID).child(chatUser);
+
+        Query messageQuery = messageDatabaseReference.orderByKey().endAt(lastKey).limitToLast(10);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                Messages messages = dataSnapshot.getValue(Messages.class);
+                String msgKey = dataSnapshot.getKey();
+                if (!prevKey.equals(lastKey)) {
+                    messagesListView.add(itemPos++, messages);
+
+                } else {
+                    prevKey = lastKey;
+                }
+
+                if (itemPos == 1) {
+
+                    lastKey = msgKey;
+                }
+
+
+                messageAdapter.notifyDataSetChanged();
+
+                swipeRefreshLayout.setRefreshing(false);
+
+                layoutManager.scrollToPositionWithOffset(10, 0);
+
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -234,6 +293,14 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages = dataSnapshot.getValue(Messages.class);
+
+                itemPos++;
+
+                if (itemPos == 1) {
+                    String msgKey = dataSnapshot.getKey();
+                    lastKey = msgKey;
+                    prevKey = msgKey;
+                }
                 messagesListView.add(messages);
                 messageAdapter.notifyDataSetChanged();
                 messageList.scrollToPosition(messagesListView.size() - 1);
