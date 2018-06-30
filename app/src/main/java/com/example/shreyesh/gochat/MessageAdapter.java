@@ -22,72 +22,100 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
+public class MessageAdapter extends RecyclerView.Adapter {
 
 
     private List<Messages> messagesList;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
 
+    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
+    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
+
     public MessageAdapter(List<Messages> messagesList) {
         this.messagesList = messagesList;
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_single_layout, parent, false);
-
-        return new ViewHolder(view);
-    }
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageAdapter.ViewHolder holder, int position) {
-
+    public int getItemViewType(int position) {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.keepSynced(true);
+
+        Messages messages = (Messages) messagesList.get(position);
         String currentUserID = firebaseAuth.getCurrentUser().getUid();
-        String message = messagesList.get(position).getMessage();
         String fromUserID = messagesList.get(position).getFrom();
         if (fromUserID.equals(currentUserID)) {
-            holder.messageText.setBackgroundResource(R.drawable.message_single_current);
-            holder.messageText.setTextColor(Color.BLACK);
+            return VIEW_TYPE_MESSAGE_SENT;
         } else {
-            holder.messageText.setBackgroundResource(R.drawable.message_text_background);
-            holder.messageText.setTextColor(Color.WHITE);
+            return VIEW_TYPE_MESSAGE_RECEIVED;
         }
-        databaseReference.child("users").child(fromUserID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String image = dataSnapshot.child("thumbnail").getValue().toString();
-                holder.setMessageImage(image);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-        holder.setMessageText(message);
 
     }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+        if (viewType == 2) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_single_layout, parent, false);
+            return new RecivedViewHolder(view);
+        } else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_single_layout_current, parent, false);
+            return new SentViewHolder(view);
+        }
+
+
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
+        firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.keepSynced(true);
+
+        String message = messagesList.get(position).getMessage();
+        String currentUserID = firebaseAuth.getCurrentUser().getUid();
+        String fromUserID = messagesList.get(position).getFrom();
+
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_MESSAGE_RECEIVED:
+                ((RecivedViewHolder) holder).setMessageText(message);
+                databaseReference.child("users").child(fromUserID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String image = dataSnapshot.child("thumbnail").getValue().toString();
+                        ((RecivedViewHolder) holder).setMessageImage(image);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                break;
+            case VIEW_TYPE_MESSAGE_SENT:
+                ((SentViewHolder) holder).setMessageSent(message);
+                break;
+        }
+
+    }
+
 
     @Override
     public int getItemCount() {
         return messagesList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class RecivedViewHolder extends RecyclerView.ViewHolder {
 
         public TextView messageText;
         public CircleImageView messageImage;
         View view;
 
-        public ViewHolder(View itemView) {
+        public RecivedViewHolder(View itemView) {
             super(itemView);
             view = itemView;
             messageText = (TextView) view.findViewById(R.id.messageSingleText);
@@ -104,5 +132,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
     }
 
+    public class SentViewHolder extends RecyclerView.ViewHolder {
+
+        View view;
+        TextView messageSent;
+
+        public SentViewHolder(View itemView) {
+            super(itemView);
+            view = itemView;
+            messageSent = (TextView) view.findViewById(R.id.messageSingleTextCurrent);
+        }
+
+        public void setMessageSent(String text) {
+            messageSent.setText(text);
+        }
+    }
 
 }
