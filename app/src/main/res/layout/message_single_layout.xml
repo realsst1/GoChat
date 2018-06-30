@@ -29,5 +29,16 @@
         app:layout_constraintStart_toEndOf="@+id/messageSingleImage"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/messageSingleTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/messageSingleText"
+        app:layout_constraintStart_toEndOf="@+id/messageSingleText" />
+
 
 </android.support.constraint.ConstraintLayout>

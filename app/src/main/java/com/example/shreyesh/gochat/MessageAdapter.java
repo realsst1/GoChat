@@ -18,9 +18,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static java.text.DateFormat.getDateTimeInstance;
 
 public class MessageAdapter extends RecyclerView.Adapter {
 
@@ -78,6 +83,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
         String message = messagesList.get(position).getMessage();
         String currentUserID = firebaseAuth.getCurrentUser().getUid();
         String fromUserID = messagesList.get(position).getFrom();
+        final Long time = messagesList.get(position).getTime();
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_RECEIVED:
@@ -87,6 +93,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String image = dataSnapshot.child("thumbnail").getValue().toString();
                         ((RecivedViewHolder) holder).setMessageImage(image);
+                        ((RecivedViewHolder) holder).setMessageTime(time);
 
                     }
 
@@ -98,6 +105,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
                 break;
             case VIEW_TYPE_MESSAGE_SENT:
                 ((SentViewHolder) holder).setMessageSent(message);
+                ((SentViewHolder) holder).setMessageTime(time);
                 break;
         }
 
@@ -111,7 +119,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
 
     public class RecivedViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView messageText;
+        public TextView messageText, messageTime;
         public CircleImageView messageImage;
         View view;
 
@@ -120,7 +128,7 @@ public class MessageAdapter extends RecyclerView.Adapter {
             view = itemView;
             messageText = (TextView) view.findViewById(R.id.messageSingleText);
             messageImage = (CircleImageView) view.findViewById(R.id.messageSingleImage);
-
+            messageTime = (TextView) view.findViewById(R.id.messageSingleTimestamp);
         }
 
         public void setMessageText(String message) {
@@ -130,21 +138,44 @@ public class MessageAdapter extends RecyclerView.Adapter {
         public void setMessageImage(String image) {
             Picasso.get().load(image).placeholder(R.drawable.avatarplaceholder).into(messageImage);
         }
+
+        public void setMessageTime(Long time) {
+            Date date = new Date(time);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+            messageTime.setText(simpleDateFormat.format(date));
+        }
+
+        /*public  String getTimeDate(long timeStamp){
+            try{
+                DateFormat dateFormat = getDateTimeInstance();
+                Date netDate = (new Date(timeStamp));
+                return dateFormat.format(netDate);
+            } catch(Exception e) {
+                return "date";
+            }
+        }*/
     }
 
     public class SentViewHolder extends RecyclerView.ViewHolder {
 
         View view;
-        TextView messageSent;
+        TextView messageSent, messageTime;
 
         public SentViewHolder(View itemView) {
             super(itemView);
             view = itemView;
             messageSent = (TextView) view.findViewById(R.id.messageSingleTextCurrent);
+            messageTime = (TextView) view.findViewById(R.id.messageSingleTextCurrentTime);
         }
 
         public void setMessageSent(String text) {
             messageSent.setText(text);
+        }
+
+        public void setMessageTime(Long time) {
+            Date date = new Date(time);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+            messageTime.setText(simpleDateFormat.format(date));
         }
     }
 
