@@ -54,7 +54,10 @@
         </activity>
         <activity
             android:name=".ChatActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ForgotPassword"
+            android:parentActivityName=".LoginActivity"></activity>
     </application>
 
 </manifest>

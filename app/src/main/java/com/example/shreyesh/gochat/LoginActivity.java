@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private Toolbar loginPageToolbar;
     private TextInputLayout loginEmail, loginPassword;
-    private Button loginButtonLoginPage;
+    private Button loginButtonLoginPage, forgotPassword;
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
     private DatabaseReference databaseReference;
@@ -56,6 +56,10 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Invalid Email", Toast.LENGTH_LONG).show();
                     return;
                 }
+                if (!AppStatus.getInstance(LoginActivity.this).isOnline()) {
+                    Toast.makeText(LoginActivity.this, "No Internet.Check network settings", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 progressDialog.setTitle("Logging In");
                 progressDialog.setMessage("Please wait while we check your credentials...");
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -65,7 +69,19 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent forgotIntent = new Intent(LoginActivity.this, ForgotPassword.class);
+                startActivity(forgotIntent);
+            }
+        });
+
+
     }
+
+
 
     private void login(String email, String password) {
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -97,5 +113,6 @@ public class LoginActivity extends AppCompatActivity {
         loginEmail = (TextInputLayout) findViewById(R.id.loginEmail);
         loginPassword = (TextInputLayout) findViewById(R.id.loginPassword);
         loginButtonLoginPage = (Button) findViewById(R.id.loginButton);
+        forgotPassword = (Button) findViewById(R.id.resetPasswordButton);
     }
 }
