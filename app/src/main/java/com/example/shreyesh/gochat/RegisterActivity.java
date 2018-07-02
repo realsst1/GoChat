@@ -67,6 +67,10 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Password length should atleast be 8", Toast.LENGTH_LONG).show();
                     return;
                 }
+                if (!AppStatus.getInstance(RegisterActivity.this).isOnline()) {
+                    Toast.makeText(RegisterActivity.this, "No Internet.Check network settings", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 progressDialog.setTitle("Registering User");
                 progressDialog.setMessage("Please wait while we register you..");
                 progressDialog.setCanceledOnTouchOutside(false);

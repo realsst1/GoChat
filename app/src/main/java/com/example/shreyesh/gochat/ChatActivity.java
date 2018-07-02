@@ -209,6 +209,10 @@ public class ChatActivity extends AppCompatActivity {
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!AppStatus.getInstance(ChatActivity.this).isOnline()) {
+                    Toast.makeText(ChatActivity.this, "No Internet.Check network settings", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 sendMessage();
                 sendMessageText.setText("");
             }
@@ -218,6 +222,10 @@ public class ChatActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if (!AppStatus.getInstance(ChatActivity.this).isOnline()) {
+                    Toast.makeText(ChatActivity.this, "No Internet.Check network settings", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 currentPage++;
                 itemPos = 0;
                 loadMoreMessages();
