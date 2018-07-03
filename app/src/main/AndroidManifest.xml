@@ -57,7 +57,10 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ForgotPassword"
-            android:parentActivityName=".LoginActivity"></activity>
+            android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".ChangeEmailActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

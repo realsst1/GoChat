@@ -4,10 +4,13 @@
 
     <item
         android:id="@+id/mainAccountSettings"
-        android:title="Account Settings" />
+        android:title=" Profile Settings" />
     <item
         android:id="@+id/mainAllUsers"
         android:title="All Users" />
+    <item
+        android:id="@+id/mainChangeEmail"
+        android:title="Change Email" />
     <item
         android:id="@+id/mainLogOutButton"
         android:title="Logout" />

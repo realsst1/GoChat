@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.mainAllUsers) {
             startActivity(new Intent(MainActivity.this, UsersActivity.class));
         }
+        if (item.getItemId() == R.id.mainChangeEmail) {
+            startActivity(new Intent(MainActivity.this, ChangeEmailActivity.class));
+        }
+
         return true;
     }
 }
